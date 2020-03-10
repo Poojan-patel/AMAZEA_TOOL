@@ -1,0 +1,31 @@
+import face_recognition
+import sys
+import re
+import os
+import cv2
+
+def image_files_in_folder(folder):
+    return [os.path.join(folder, f) for f in os.listdir(folder) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
+
+if os.path.isdir(sys.argv[1]):
+	known_images = image_files_in_folder(sys.argv[1])
+else:
+	known_images = [sys.argv[1]]
+
+picture_of_me = [face_recognition.load_image_file(i) for i in known_images]
+my_face_encoding = [face_recognition.face_encodings(i)[0] for i in picture_of_me]
+
+# my_face_encoding now contains a universal 'encoding' of my facial features that can be compared to any other picture of a face!
+
+unknown_picture = face_recognition.load_image_file(sys.argv[2])
+unknown_face_encoding = face_recognition.face_encodings(unknown_picture)[0]
+
+# Now we can see the two face encodings are of the same person with `compare_faces`!
+
+results = face_recognition.compare_faces(my_face_encoding, unknown_face_encoding)
+print(results)
+
+for i in range(len(results)):
+	if(results[i] == True):
+		print("Found: " + (re.split("['/','.']",known_images[i])[-2]))
+
