@@ -4,12 +4,13 @@ import copy
 import time
 import os
 import re
-import face_recognition
+import PIL.Image
+import face_recognition 
 
 faceCascade = cv2.CascadeClassifier(sys.argv[1])
 known_images = [os.path.join(sys.argv[2], f) for f in os.listdir(sys.argv[2]) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
 known_schemas = [face_recognition.load_image_file(i) for i in known_images]
-known_encodings = [face_recognition.face_encodings(i) for i in known_schemas]
+known_encodings = [face_recognition.face_encodings(i)[0] for i in known_schemas]
 
 flag = False
 frame = 5
@@ -28,7 +29,7 @@ while time.time() - start < 20:
         #print(check) #prints true as long as the webcam is running
         #print(frame) #prints matrix values of each framecd 
         cv2.imshow("Face Recognition", frame)
-        cv2.imwrite(filename="temp.jpg", img=frame)
+        #cv2.imwrite(filename="temp.jpg", img=frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(
             gray,
@@ -37,17 +38,21 @@ while time.time() - start < 20:
             minSize=(10, 10),
             #flags=cv2.CV_HAAR_SCALE_IMAGE
         )
-        unknown_picture = face_recognition.load_image_file('temp.jpg',mode="RGB")
-        unknown_face_encoding = face_recognition.face_encodings(unknown_picture)
+        unknown_image = frame
+        if max(frame.shape) > 1600:
+            pil_img = PIL.Image.fromarray(frame)
+            pil_img.thumbnail((1600, 1600), PIL.Image.LANCZOS)
+            unknown_image = np.array(pil_img)
+        #unknown_picture = face_recognition.load_image_file('temp.jpg',mode="RGB")
+        unknown_face_encoding = face_recognition.face_encodings(unknown_image)
 
         if(len(unknown_face_encoding) != 0):
-            results = face_recognition.compare_faces(known_encodings[0], unknown_face_encoding[0])
+            results = face_recognition.compare_faces(known_encodings, unknown_face_encoding[0])
 
             for i in range(len(results)):
                 if(results[i] == True):
                     print("Found: " + (re.split("['/','.']",known_images[i])[-2]))
-                    flag_run = False
-                    break
+                    #flag_run = False
         #print(faces)
 
     # Draw a rectangle around the faces
@@ -82,6 +87,7 @@ while time.time() - start < 20:
         
             break
         elif (key == ord('q') or flag_run == False):
+            flag = True
             print("Turning off camera.")
             webcam.release()
             print("Camera off.")
@@ -96,6 +102,7 @@ while time.time() - start < 20:
         print("Program ended.")
         cv2.destroyAllWindows()
         break
+    flag_run = False;
 if(flag == False and flag_run == True):
     webcam.release()
     cv2.waitKey(1650)
