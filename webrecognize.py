@@ -4,8 +4,7 @@ import copy
 import time
 import os
 import re
-import PIL.Image
-import face_recognition 
+import face_recognition
 
 faceCascade = cv2.CascadeClassifier(sys.argv[1])
 known_images = [os.path.join(sys.argv[2], f) for f in os.listdir(sys.argv[2]) if re.match(r'.*\.(jpg|jpeg|png)', f, flags=re.I)]
@@ -13,10 +12,10 @@ known_schemas = [face_recognition.load_image_file(i) for i in known_images]
 known_encodings = [face_recognition.face_encodings(i)[0] for i in known_schemas]
 
 flag = False
+dic = {}
 frame = 5
 key = cv2. waitKey(1)
 webcam = cv2.VideoCapture(0)
-#webcam.set(cv2.cv.CV_CAP_PROP_FPS, 10)
 start = time.time()
 #while (time.time() - start < 200):
 while time.time() - start < 20:
@@ -25,11 +24,8 @@ while time.time() - start < 20:
     try:
         #global frame
         check, frame = webcam.read()
-        frame2 = copy.copy(frame)
-        #print(check) #prints true as long as the webcam is running
-        #print(frame) #prints matrix values of each framecd 
+        frame2 = copy.copy(frame) 
         cv2.imshow("Face Recognition", frame)
-        #cv2.imwrite(filename="temp.jpg", img=frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(
             gray,
@@ -38,26 +34,23 @@ while time.time() - start < 20:
             minSize=(10, 10),
             #flags=cv2.CV_HAAR_SCALE_IMAGE
         )
-        unknown_image = frame
-        if max(frame.shape) > 1600:
-            pil_img = PIL.Image.fromarray(frame)
-            pil_img.thumbnail((1600, 1600), PIL.Image.LANCZOS)
-            unknown_image = np.array(pil_img)
-        #unknown_picture = face_recognition.load_image_file('temp.jpg',mode="RGB")
-        unknown_face_encoding = face_recognition.face_encodings(unknown_image)
+        unknown_face_encoding = face_recognition.face_encodings(frame)
 
         if(len(unknown_face_encoding) != 0):
-            results = face_recognition.compare_faces(known_encodings, unknown_face_encoding[0])
+            results = face_recognition.compare_faces(known_encodings, unknown_face_encoding[0],tolerance=0.5)
 
             for i in range(len(results)):
                 if(results[i] == True):
-                    print("Found: " + (re.split("['/','.']",known_images[i])[-2]))
+                    x = re.split("['/','.']",known_images[i])[-2]
+                    if x not in dic.keys():
+                        dic[x]=0
+                    else:
+                        dic[x] +=1
                     #flag_run = False
-        #print(faces)
-
-    # Draw a rectangle around the faces
+        
         for (x, y, w, h) in faces:
             cv2.rectangle(frame2, (x, y), (x+w, y+h), (255, 255, 255), 3)
+            cv2.putText(frame2, "Face", (x+w-50,y+h-10), cv2.FONT_HERSHEY_DUPLEX, 0.5, (255,255,60), 2)
         cv2.imshow('Face Recognition', frame2)
 
         key = cv2.waitKey(10)
@@ -102,12 +95,22 @@ while time.time() - start < 20:
         print("Program ended.")
         cv2.destroyAllWindows()
         break
-    flag_run = False;
-if(flag == False and flag_run == True):
-    webcam.release()
-    cv2.waitKey(1650)
-    cv2.destroyAllWindows()
+total_detection = sum(dic.values())
+maxi = 0
+person = ""
+for i,j in dic.items():
+    if(j/total_detection > maxi and j/total_detection):
+        maxi = j/total_detection
+        person = i
+webcam.release()
+cv2.waitKey(1650)
+cv2.destroyAllWindows()
+print(dic)
+if(maxi < 0.5 and len(dic.keys()) != 1):
     name = input("Enter Your Name:")+'.jpg'
     cv2.imwrite(filename=name, img=frame)
+else:
+    print("Found: "+person)
+
 
     
