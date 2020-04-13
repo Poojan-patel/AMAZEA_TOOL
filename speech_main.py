@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[39]:
-
-
 from tkinter import *
 import tkinter as tk
 from PIL import ImageTk ,Image
@@ -13,7 +7,7 @@ from translate import Translator
 lan1=""
 lan2=""
 dic={'English':'en','Italian':'it','Gujarati':'gu','Portuguese':'pt','French':'fr','Hindi':'hi','German':'de'}
-def main():
+def main(name):
     def change_dropdown1(*args):
         global lan1
         lan=v1.get()
@@ -47,8 +41,9 @@ def main():
     mw3.configure(background='deepskyblue2')
     mw3.geometry("700x600")
 
-    l1=tk.Label(mw3,text="Amazea : Speech recognition and translation...",font=('comicsans', 20),bg='lavender',fg='PaleVioletRed4')
-    l1.place(x=70,y=25)
+    fname="Welcome "+name+"..."
+    l1=tk.Label(mw3,text=fname,font=('comicsans', 20),bg='lavender',fg='PaleVioletRed4')
+    l1.place(x=170,y=25)
 
     v1=StringVar(mw3)
     v2=StringVar(mw3)
@@ -77,5 +72,3 @@ def main():
     quit.place(x=325,y=550)
 
     mw3.mainloop()
-main()
-
