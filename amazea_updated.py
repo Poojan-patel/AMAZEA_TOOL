@@ -1,15 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[11]:
-
-
 import cv2
 import webrecognize
 import sys
 from tkinter import *
 import tkinter as tk 
-import signup as sp
+import signup_updated as sp
 import speech_main as sm
 def face_reco_done_or_not():
     mw.destroy()
@@ -18,10 +12,13 @@ def face_reco_done_or_not():
     if(name == 'No'):
         var = sp.main()
         cv2.imwrite(filename=var, img=frame)
-        sm.main()
+        res=var[:-(4)]
+        #print(res+" a")
+        sm.main(res)
     else:
         print("Found")
-        sm.main()
+        res=name[:-(4)]
+        sm.main(res)
 
 def fun():
     video_capture = cv2.VideoCapture(0)
@@ -37,18 +34,11 @@ def fun():
 mw = tk.Tk()
 mw.title('AMAZEA')
 mw.configure(background='turquoise')
-mw.geometry("500x500")
-lbl = tk.Label(mw, text='Welcome to Lightning Parties!', fg='purple', bg='turquoise', font=('comicsans', 14))
-lbl.pack()
+mw.geometry("600x200")
+lbl = tk.Label(mw, text='Amazea : Face and Speech recognition and translation...', fg='purple', bg='NavajoWhite', font=('comicsans', 15))
+lbl.place(x=50,y=20)
 
-btn = tk.Button(mw,text="Face Recognition",command=face_reco_done_or_not)
-btn.pack()
+btn = tk.Button(mw,text="Face Recognition",command=face_reco_done_or_not,bg='SkyBlue3',font=10,fg='RoyalBlue3')
+btn.place(x=215,y=100)
 
 mw.mainloop()
-
-
-# In[ ]:
-
-
-
-
