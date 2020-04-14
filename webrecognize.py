@@ -116,4 +116,7 @@ def function_for_face_reco(arg):
 
 
 if __name__ == "__main__":
-    function_for_face_reco(sys.argv)
+    name,frame = function_for_face_reco(sys.argv)
+    if(name == 'No'):
+        name = './Known/'+input('Your Good Name:')+'.jpg'
+        cv2.imwrite(filename=name, img=frame)
