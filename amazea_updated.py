@@ -10,26 +10,16 @@ def face_reco_done_or_not():
     args=["","frontfacial.xml","./Known/"]
     name, frame = webrecognize.function_for_face_reco(args)
     if(name == 'No'):
-        var = sp.main()
+        var = './Known/'+sp.main()
         cv2.imwrite(filename=var, img=frame)
         res=var[:-(4)]
+        res=(res.split("/"))[-1]
         #print(res+" a")
         sm.main(res)
     else:
         print("Found")
-        res=name[:-(4)]
+        res=name
         sm.main(res)
-
-def fun():
-    video_capture = cv2.VideoCapture(0)
-
-    while True:
-        ret, frame = video_capture.read()
-        cv2.imshow('Face_Reco', frame)
-        if (cv2.waitKey(1) & 0xFF == ord('q')):
-            break
-    video_capture.release()
-    cv2.destroyAllWindows()
 
 mw = tk.Tk()
 mw.title('AMAZEA')
