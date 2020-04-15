@@ -10,7 +10,7 @@ def face_reco_done_or_not():
     args=["","frontfacial.xml","./Known/"]
     name, frame = webrecognize.function_for_face_reco(args)
     if(name == 'No'):
-        var = './Known/'+sp.main()
+        var = args[2]+sp.main()
         cv2.imwrite(filename=var, img=frame)
         res=var[:-(4)]
         res=(res.split("/"))[-1]
